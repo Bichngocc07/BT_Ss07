@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cập nhật thông tin Nhà hàng</title>
+    <style>
+        .form-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 120px; }
+    </style>
+</head>
+<body>
+<h2>Cập nhật hồ sơ nhà hàng</h2>
+
+<form th:action="@{/merchant/update-profile}" th:object="${restaurantProfile}" method="POST">
+
+    <div class="form-group">
+        <label>Tên cửa hàng:</label>
+        <input type="text" th:field="*{name}" placeholder="Nhập tên quán..." />
+    </div>
+
+    <div class="form-group">
+        <label>Số điện thoại:</label>
+        <input type="text" th:field="*{phone}" placeholder="Nhập số điện thoại..." />
+    </div>
+
+    <div class="form-group">
+        <label>Đang mở cửa:</label>
+        <input type="checkbox" th:field="*{active}" />
+    </div>
+
+    <button type="submit">Lưu thông tin</button>
+</form>
+</body>
+</html>
+<!--PHẦN 1 – PHÂN TÍCH LOGIC (DATA BINDING & TRACE CODE)-->
+<!--🔹 1. Giải thích vì sao Tên cửa hàng bị null-->
+
+<!--Trong form HTML hiện tại, trường nhập tên cửa hàng được khai báo như sau:-->
+
+<!--<input type="text" name="restaurantName" />-->
+
+<!--Khi người dùng nhập dữ liệu và submit form, request gửi lên server sẽ có dạng:-->
+
+<!--restaurantName = "ABC Restaurant"-->
+
+<!--Trong khi đó, ở phía backend, class RestaurantProfile được định nghĩa với thuộc tính:-->
+
+<!--private String name;-->
+
+<!--Và controller nhận dữ liệu như sau:-->
+
+<!--@PostMapping("/merchant/update-profile")-->
+<!--public String updateProfile(RestaurantProfile profile) {-->
+<!--System.out.println(profile.getName());-->
+<!--}-->
+<!--Phân tích cơ chế Data Binding của Spring-->
+
+<!--Spring MVC sử dụng cơ chế Data Binding tự động, hoạt động theo nguyên tắc:-->
+
+<!--Lấy tất cả các parameter từ request-->
+<!--So sánh tên parameter với tên field trong object-->
+<!--Nếu trùng tên → gọi setter để gán giá trị-->
+<!--Vấn đề xảy ra-->
+<!--Request gửi lên có: restaurantName-->
+<!--Model yêu cầu: name-->
+
+<!--➡Hai tên này không trùng nhau-->
+
+<!--→ Spring không tìm thấy parameter tương ứng với field name-->
+<!--→ Không gọi setName()-->
+<!--→ Giá trị của name giữ nguyên mặc định là null-->
+Checkbox active không hoạt động đúng vì:
+
+<!--Giá trị "Mở cửa" không thể chuyển đổi sang kiểu boolean-->
+<!--Khi checkbox không được chọn, không có dữ liệu gửi lên server, khiến -->
+<!--Spring không thể bind giá trị cho field active-->
+<!--Điều này làm cho giá trị boolean không phản ánh đúng trạng -->
+<!--thái thực tế của người dùng-->
