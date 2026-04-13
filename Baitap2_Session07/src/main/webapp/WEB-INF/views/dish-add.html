@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm món ăn</title>
+</head>
+<body>
+<h2>Thêm món ăn mới</h2>
+<form>
+    <label>Tên món:</label>
+    <input type="text" name="dishName" /><br><br>
+
+    <label>Nhóm món ăn:</label>
+    <select name="category">
+        <option th:each="cat : ${categories}"
+                th:value="${cat}"
+                th:text="${cat}">
+        </option>
+    </select>
+    <br><br>
+    <button type="submit">Lưu món ăn</button>
+</form>
+</body>
+</html>
+PHẦN 1 – PHÂN TÍCH LOGIC
+🔹 1. Vấn đề trong mã nguồn hiện tại
+
+Trong DishController, danh sách dropdown categories được khai báo lặp lại ở nhiều method:
+
+List<String> categories = Arrays.asList("Món chính", "Đồ uống", "Tráng miệng", "Topping");
+    model.addAttribute("categories", categories);
+
+<!--    Đoạn code này xuất hiện trong:-->
+
+<!--    API thêm mới (/add)-->
+<!--    API chỉnh sửa (/edit)-->
+<!--    API tìm kiếm (/search)-->
+<!--    Nhận xét-->
+
+<!--    Đây là code bị lặp lại (duplicate code) ở nhiều nơi trong cùng một controller.-->
+
+<!--    🔹 2. Vi phạm nguyên tắc thiết kế nào?-->
+<!--    Vi phạm nguyên tắc: DRY (Don't Repeat Yourself)-->
+<!--    Giải thích-->
+
+<!--    Nguyên tắc DRY yêu cầu:-->
+
+<!--    Một logic chỉ nên được định nghĩa duy nhất một lần trong hệ thống-->
+
+<!--    Trong trường hợp này:-->
+
+<!--    Danh sách categories:-->
+
+<!--    Là dữ liệu dùng chung-->
+<!--    Nhưng lại được viết lại nhiều lần-->
+
+<!--    Khiến code:-->
+
+<!--    Dài dòng-->
+<!--    Khó bảo trì-->
+<!--    Dễ sai sót-->
+<!--    🔹 3. Rủi ro khi hệ thống mở rộng-->
+
+<!--    Giả sử:-->
+
+<!--    Sau này có 20 trang giao diện đều cần dropdown categories-->
+
+<!--    Các vấn đề sẽ xảy ra-->
+<!--    🔸 1. Khó bảo trì-->
+
+<!--    Nếu cần thay đổi danh sách:-->
+
+<!--    Thêm "Món chay"-->
+
+<!--    ➡Bạn phải sửa ở 20 nơi khác nhau-->
+
+<!--    🔸 2. Dễ gây lỗi không đồng bộ-->
+
+<!--    Ví dụ:-->
+
+<!--    Trang A có "Món chay"-->
+<!--    Trang B quên sửa-->
+
+<!--    Giao diện không thống nhất-->
+<!--    Lỗi nghiệp vụ-->
+
+<!--    🔸 3. Tăng chi phí phát triển-->
+<!--    Mỗi lần thêm API mới → phải copy lại code-->
+<!--    Tốn thời gian + dễ copy sai-->
+<!--    🔸 4. Code kém chuyên nghiệp-->
+<!--    Controller bị “phình to”-->
+<!--    Lẫn logic hiển thị với logic nghiệp vụ-->
+<!--    🔹 4. Bản chất vấn đề-->
+
+<!--    categories là dữ liệu dùng chung (shared data)-->
+
+<!--    Nhưng lại đang:-->
+
+<!--    Được xử lý như dữ liệu riêng từng API-->
+
+<!--    Sai cách tổ chức-->
+
+<!--    🔹 5. Hướng giải quyết (ý tưởng – chưa code)-->
+
+<!--    Spring MVC cung cấp:-->
+
+<!--    @ModelAttribute (method-level)-->
+
+<!--    Cho phép:-->
+
+<!--    Khai báo dữ liệu dùng chung 1 lần-->
+<!--    Tự động inject vào tất cả request trong controller-->
